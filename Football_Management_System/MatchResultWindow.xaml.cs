@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -11,6 +12,9 @@ namespace Football_Management_System
         // Danh sách trận đấu
         private ObservableCollection<Match> danhSachTranDau = new ObservableCollection<Match>();
         
+        // Danh sách gốc (để tìm kiếm)
+        private List<Match> danhSachGoc = new List<Match>();
+        
         // Trận đấu đang được chọn (để sửa)
         private Match tranDauDangChon = null;
 
@@ -18,6 +22,7 @@ namespace Football_Management_System
         {
             InitializeComponent();
             LoadData();
+            CapNhatThongKe();
         }
 
         // Load dữ liệu lên giao diện
@@ -26,6 +31,13 @@ namespace Football_Management_System
             cboMatch.ItemsSource = danhSachTranDau;
             cboMatch.DisplayMemberPath = "DisplayName";
             dgMatches.ItemsSource = danhSachTranDau;
+        }
+
+        // Cập nhật thống kê
+        private void CapNhatThongKe()
+        {
+            txtTongTran.Text = danhSachTranDau.Count.ToString();
+            txtDaCoKQ.Text = danhSachTranDau.Count(m => m.HomeScore.HasValue).ToString();
         }
 
         // Khi chọn trận trong ComboBox
@@ -48,6 +60,24 @@ namespace Football_Management_System
             }
         }
 
+        // Tìm kiếm
+        private void txtSearch_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            string keyword = txtSearch.Text.Trim().ToLower();
+            
+            if (string.IsNullOrEmpty(keyword))
+            {
+                dgMatches.ItemsSource = danhSachTranDau;
+            }
+            else
+            {
+                var ketQua = danhSachTranDau.Where(m => 
+                    m.HomeTeam.ToLower().Contains(keyword) || 
+                    m.AwayTeam.ToLower().Contains(keyword)).ToList();
+                dgMatches.ItemsSource = ketQua;
+            }
+        }
+
         // Hiển thị thông tin trận đấu lên form
         private void HienThiThongTin(Match match)
         {
@@ -57,6 +87,11 @@ namespace Football_Management_System
             dpMatchDate.SelectedDate = match.MatchDate;
             txtHomeScore.Text = match.HomeScore?.ToString() ?? "";
             txtAwayScore.Text = match.AwayScore?.ToString() ?? "";
+            txtHomeYellow.Text = match.HomeYellowCards?.ToString() ?? "";
+            txtAwayYellow.Text = match.AwayYellowCards?.ToString() ?? "";
+            txtHomeRed.Text = match.HomeRedCards?.ToString() ?? "";
+            txtAwayRed.Text = match.AwayRedCards?.ToString() ?? "";
+            txtNote.Text = match.Note ?? "";
         }
 
         // Nút Thêm
@@ -65,17 +100,17 @@ namespace Football_Management_System
             // Kiểm tra dữ liệu
             if (string.IsNullOrWhiteSpace(txtHomeTeam.Text))
             {
-                txtStatus.Text = "Vui lòng nhập tên đội nhà!";
+                txtStatus.Text = "⚠️ Vui lòng nhập tên đội nhà!";
                 return;
             }
             if (string.IsNullOrWhiteSpace(txtAwayTeam.Text))
             {
-                txtStatus.Text = "Vui lòng nhập tên đội khách!";
+                txtStatus.Text = "⚠️ Vui lòng nhập tên đội khách!";
                 return;
             }
             if (dpMatchDate.SelectedDate == null)
             {
-                txtStatus.Text = "Vui lòng chọn ngày thi đấu!";
+                txtStatus.Text = "⚠️ Vui lòng chọn ngày thi đấu!";
                 return;
             }
 
@@ -94,10 +129,25 @@ namespace Football_Management_System
             if (int.TryParse(txtAwayScore.Text, out int awayScore))
                 tranMoi.AwayScore = awayScore;
 
+            // Thêm thẻ phạt
+            if (int.TryParse(txtHomeYellow.Text, out int hy))
+                tranMoi.HomeYellowCards = hy;
+            if (int.TryParse(txtAwayYellow.Text, out int ay))
+                tranMoi.AwayYellowCards = ay;
+            if (int.TryParse(txtHomeRed.Text, out int hr))
+                tranMoi.HomeRedCards = hr;
+            if (int.TryParse(txtAwayRed.Text, out int ar))
+                tranMoi.AwayRedCards = ar;
+
+            // Thêm ghi chú
+            tranMoi.Note = txtNote.Text.Trim();
+
             // Thêm vào danh sách
             danhSachTranDau.Add(tranMoi);
+            danhSachGoc.Add(tranMoi);
             
-            txtStatus.Text = $"Đã thêm trận: {tranMoi.HomeTeam} vs {tranMoi.AwayTeam}";
+            txtStatus.Text = $"✅ Đã thêm trận: {tranMoi.HomeTeam} vs {tranMoi.AwayTeam}";
+            CapNhatThongKe();
             XoaForm();
         }
 
@@ -106,7 +156,7 @@ namespace Football_Management_System
         {
             if (tranDauDangChon == null)
             {
-                txtStatus.Text = "Vui lòng chọn trận đấu cần sửa!";
+                txtStatus.Text = "⚠️ Vui lòng chọn trận đấu cần sửa!";
                 return;
             }
 
@@ -117,6 +167,7 @@ namespace Football_Management_System
             if (dpMatchDate.SelectedDate != null)
                 tranDauDangChon.MatchDate = dpMatchDate.SelectedDate.Value;
 
+            // Cập nhật tỷ số
             if (int.TryParse(txtHomeScore.Text, out int homeScore))
                 tranDauDangChon.HomeScore = homeScore;
             else
@@ -127,10 +178,35 @@ namespace Football_Management_System
             else
                 tranDauDangChon.AwayScore = null;
 
+            // Cập nhật thẻ phạt
+            if (int.TryParse(txtHomeYellow.Text, out int hy))
+                tranDauDangChon.HomeYellowCards = hy;
+            else
+                tranDauDangChon.HomeYellowCards = null;
+
+            if (int.TryParse(txtAwayYellow.Text, out int ay))
+                tranDauDangChon.AwayYellowCards = ay;
+            else
+                tranDauDangChon.AwayYellowCards = null;
+
+            if (int.TryParse(txtHomeRed.Text, out int hr))
+                tranDauDangChon.HomeRedCards = hr;
+            else
+                tranDauDangChon.HomeRedCards = null;
+
+            if (int.TryParse(txtAwayRed.Text, out int ar))
+                tranDauDangChon.AwayRedCards = ar;
+            else
+                tranDauDangChon.AwayRedCards = null;
+
+            // Cập nhật ghi chú
+            tranDauDangChon.Note = txtNote.Text.Trim();
+
             // Refresh DataGrid
             dgMatches.Items.Refresh();
+            CapNhatThongKe();
             
-            txtStatus.Text = $"Đã sửa trận: {tranDauDangChon.HomeTeam} vs {tranDauDangChon.AwayTeam}";
+            txtStatus.Text = $"✅ Đã sửa trận: {tranDauDangChon.HomeTeam} vs {tranDauDangChon.AwayTeam}";
         }
 
         // Nút Xóa
@@ -138,13 +214,13 @@ namespace Football_Management_System
         {
             if (tranDauDangChon == null)
             {
-                txtStatus.Text = "Vui lòng chọn trận đấu cần xóa!";
+                txtStatus.Text = "⚠️ Vui lòng chọn trận đấu cần xóa!";
                 return;
             }
 
             // Xác nhận xóa
             var result = MessageBox.Show(
-                $"Bạn có chắc muốn xóa trận {tranDauDangChon.HomeTeam} vs {tranDauDangChon.AwayTeam}?",
+                $"Bạn có chắc muốn xóa trận:\n{tranDauDangChon.HomeTeam} vs {tranDauDangChon.AwayTeam}?",
                 "Xác nhận xóa",
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Question);
@@ -153,7 +229,9 @@ namespace Football_Management_System
             {
                 string tenTran = $"{tranDauDangChon.HomeTeam} vs {tranDauDangChon.AwayTeam}";
                 danhSachTranDau.Remove(tranDauDangChon);
-                txtStatus.Text = $"Đã xóa trận: {tenTran}";
+                danhSachGoc.Remove(tranDauDangChon);
+                txtStatus.Text = $"🗑️ Đã xóa trận: {tenTran}";
+                CapNhatThongKe();
                 XoaForm();
             }
         }
@@ -162,7 +240,7 @@ namespace Football_Management_System
         private void btnClear_Click(object sender, RoutedEventArgs e)
         {
             XoaForm();
-            txtStatus.Text = "Đã làm mới form!";
+            txtStatus.Text = "🔄 Đã làm mới form!";
         }
 
         // Xóa dữ liệu trên form
@@ -176,6 +254,11 @@ namespace Football_Management_System
             dpMatchDate.SelectedDate = null;
             txtHomeScore.Text = "";
             txtAwayScore.Text = "";
+            txtHomeYellow.Text = "";
+            txtAwayYellow.Text = "";
+            txtHomeRed.Text = "";
+            txtAwayRed.Text = "";
+            txtNote.Text = "";
         }
     }
 
@@ -188,11 +271,31 @@ namespace Football_Management_System
         public DateTime MatchDate { get; set; }
         public int? HomeScore { get; set; }
         public int? AwayScore { get; set; }
+        
+        // Thẻ phạt
+        public int? HomeYellowCards { get; set; }
+        public int? AwayYellowCards { get; set; }
+        public int? HomeRedCards { get; set; }
+        public int? AwayRedCards { get; set; }
+        
+        // Ghi chú
+        public string Note { get; set; }
 
         // Hiển thị trong ComboBox
         public string DisplayName => $"{HomeTeam} vs {AwayTeam} ({MatchDate:dd/MM/yyyy})";
         
         // Hiển thị kết quả
         public string Result => HomeScore.HasValue ? $"{HomeScore} - {AwayScore}" : "Chưa có";
+        
+        // Tổng thẻ vàng
+        public string TotalYellow => (HomeYellowCards ?? 0) + (AwayYellowCards ?? 0) > 0 
+            ? ((HomeYellowCards ?? 0) + (AwayYellowCards ?? 0)).ToString() : "-";
+        
+        // Tổng thẻ đỏ
+        public string TotalRed => (HomeRedCards ?? 0) + (AwayRedCards ?? 0) > 0 
+            ? ((HomeRedCards ?? 0) + (AwayRedCards ?? 0)).ToString() : "-";
+        
+        // Trạng thái
+        public string Status => HomeScore.HasValue ? "✅ Hoàn thành" : "⏳ Chờ KQ";
     }
 }
