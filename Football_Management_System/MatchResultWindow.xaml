@@ -13,7 +13,6 @@
             <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
 
-        <!-- HEADER -->
         <Border Grid.Row="0" Background="#1565C0">
             <Grid>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0,0,0">
@@ -24,8 +23,7 @@
                                FontWeight="Bold"
                                VerticalAlignment="Center"/>
                 </StackPanel>
-                
-                <!-- Thống kê nhanh -->
+
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,20,0">
                     <Border Background="#0D47A1" CornerRadius="5" Padding="10,5" Margin="5,0">
                         <StackPanel Orientation="Horizontal">
@@ -43,19 +41,15 @@
             </Grid>
         </Border>
 
-        <!-- CONTENT -->
         <Grid Grid.Row="1" Margin="10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="320"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- LEFT: FORM NHẬP -->
             <Border Grid.Column="0" Background="#FAFAFA" CornerRadius="8" Margin="5">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="15">
-                        
-                        <!-- Tiêu đề form -->
                         <TextBlock Text="📝 THÔNG TIN TRẬN ĐẤU" FontWeight="Bold" FontSize="14" 
                                    Foreground="#1565C0" Margin="0,0,0,15"/>
                         
@@ -77,7 +71,6 @@
                         <TextBlock Text="⚽ TỶ SỐ" FontWeight="Bold" FontSize="13" 
                                    Foreground="#2E7D32" Margin="0,15,0,8"/>
                         <Grid>
-                            <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="30"/>
                                 <ColumnDefinition Width="*"/>
@@ -100,8 +93,7 @@
                         </Grid>
 
                         <!-- Thẻ phạt -->
-                        <TextBlock Text="🟨 THẺ PHẠT" FontWeight="Bold" FontSize="13" 
-                                   Foreground="#F57C00" Margin="0,15,0,8"/>
+                        <          Foreground="#F57C00" Margin="0,15,0,8"/>
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
@@ -132,14 +124,12 @@
 
                         <!-- Ghi chú -->
                         <TextBlock Text="📋 GHI CHÚ" FontWeight="Bold" FontSize="13" 
-                                   Foreground="#5E35B1" Margin="0,15,0,8"/>
-                        <TextBox x:Name="txtNote" Height="50" TextWrapping="Wrap" 
+                         TextBox x:Name="txtNote" Height="50" TextWrapping="Wrap" 
                                  AcceptsReturn="True" Padding="5"/>
 
                         <!-- BUTTONS -->
                         <StackPanel Orientation="Horizontal" Margin="0,20,0,0" HorizontalAlignment="Center">
                             <Button x:Name="btnAdd" Content="➕ Thêm" 
-                                    Width="70" Height="35" 
                                     Background="#2196F3" Foreground="White"
                                     Margin="0,0,5,0" FontWeight="SemiBold"
                                     Click="btnAdd_Click"/>
@@ -163,7 +153,6 @@
                         <!-- STATUS -->
                         <Border Background="#E3F2FD" CornerRadius="5" Padding="10" Margin="0,15,0,0">
                             <TextBlock x:Name="txtStatus" 
-                                       Foreground="#1565C0" 
                                        FontWeight="SemiBold"
                                        TextWrapping="Wrap"
                                        Text="Sẵn sàng..."/>
@@ -175,14 +164,12 @@
             <!-- RIGHT: DATAGRID + TÌM KIẾM -->
             <Grid Grid.Column="1" Margin="5">
                 <Grid.RowDefinitions>
+             Grid Grid.Column="1" Margin="5">
+                <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                
-                <!-- Thanh tìm kiếm -->
-                <Border Grid.Row="0" Background="#FAFAFA" CornerRadius="8" Padding="10" Margin="0,0,0,10">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="🔍" FontSize="16" VerticalAlignment="Center" Margin="0,0,8,0"/>
+="🔍" FontSize="16" VerticalAlignment="Center" Margin="0,0,8,0"/>
                         <TextBox x:Name="txtSearch" Width="200" Height="30" 
                                  VerticalContentAlignment="Center" Padding="5"
                                  TextChanged="txtSearch_TextChanged"/>
@@ -195,8 +182,7 @@
                 <Border Grid.Row="1" Background="#FAFAFA" CornerRadius="8" Padding="5">
                     <DataGrid x:Name="dgMatches" 
                               AutoGenerateColumns="False"
-                              IsReadOnly="True"
-                              SelectionChanged="dgMatches_SelectionChanged"
+ectionChanged="dgMatches_SelectionChanged"
                               RowHeight="35"
                               AlternatingRowBackground="#E3F2FD"
                               GridLinesVisibility="Horizontal"
@@ -220,7 +206,6 @@
             <TextBlock Text="© 2026 - Nguyễn Tấn Đức - Quản lý kết quả trận đấu" 
                        Foreground="#B0BEC5" 
                        FontSize="11"
-                       VerticalAlignment="Center"
                        HorizontalAlignment="Center"/>
         </Border>
     </Grid>
